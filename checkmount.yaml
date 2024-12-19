@@ -1,0 +1,16 @@
+---
+- name: Check mount points
+  hosts: all
+  tasks:
+    - name: Read fstab
+      command: cat /etc/fstab
+      register: fstab_output
+
+    - name: Check mounted points
+      command: cat /proc/mounts
+      register: mounts_output
+
+    - name: Validate mounts
+      debug:
+        msg: "Missing mounts: {{ item }}"
+      with_items: "{{ fstab_output.stdout_lines | difference(mounts_output.stdout_lines) }}"
